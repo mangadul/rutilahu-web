@@ -454,7 +454,12 @@ Ext.onReady(function() {
 	});
 		
 			var titikListener = {
+				featureselected:function(evt){
+					var feature = evt.feature;
+					console.log("fitur dipilih: "+feature);
+				},	
 				featureclick: function(e) {
+					//console.log(e.feature);
 					winDetail.setTitle('Detail Penerima Bantuan :: '+e.feature.id+' :: '+e.feature.nama);
 					winDetail.on('show', function(win) {
 						frmDetail.getForm().load({
@@ -531,6 +536,7 @@ Ext.onReady(function() {
 		var lonlat_ = [104.4803663, 1.0898176];
 		var zpj_epsg_900913 = new OpenLayers.Projection("EPSG:900913");
 		var zpj_epsg_4326 = new OpenLayers.Projection("EPSG:4326");
+		
 		$.getJSON('<?=base_url()?>index.php/rutilahu/Main/get_titiktengah_peta', function(tengah) {
 			var tlong = tengah[0].titik_tengah_long;
 			var tlat = tengah[0].titik_tengah_lat;
@@ -560,17 +566,29 @@ Ext.onReady(function() {
 				peta.addControl(new OpenLayers.Control.LayerSwitcherGroups());
 			}); 
 		});		
-		
+
 		/* tahun */
 		//var gTahunLayer = [];
 		$.getJSON('<?=base_url()?>index.php/rutilahu/Main/get_tahun_peta', function(dtahun) {
+			
+			//var renderer = OpenLayers.Layer.Vector.prototype.renderers;
+			
 		  $.each(dtahun.data, function(i, thn) {	
 			var strLayer = "LayerTahun"+thn;
 			strLayer = new OpenLayers.Layer.Vector("Tahun "+thn, {
 					projection: "EPSG:4326",
-					eventListeners: titikListener
+					eventListeners: titikListener,
 				}
 			);  	
+			Ext.MessageBox.show({
+			   title: 'Silahkan tunggu',
+			   msg: 'Sedang mengambil data...',
+			   progressText: 'Loading...',
+			   width:300,
+			   progress:true,
+			   closable:true,
+			});									
+						
 			$.getJSON('<?=base_url()?>index.php/rutilahu/Main/get_data_tahun', {tahun: thn}, function(tdata) {
 			  $.each(tdata.data, function(j, t) {
 				var tlokasi = [], f_id=[], f_nama=[];
@@ -578,32 +596,82 @@ Ext.onReady(function() {
 				var py = t.longitude;
 				f_id = t.id_penerima;
 				f_nama = t.namalengkap;
-				var lonlat = new OpenLayers.LonLat(px, py);
+				var lonlat = new OpenLayers.LonLat(px, py);					
 				lonlat.transform(new OpenLayers.Projection("EPSG:4326"), new OpenLayers.Projection("EPSG:900913"));
 				var pG = new OpenLayers.Geometry.Point(lonlat.lon, lonlat.lat);
 				var icon = '<?=base_url()?>assets/images/markers/home%s.png';
 				var iconImg = icon.replace(/%s/g, i);	
 				var pF = new OpenLayers.Feature.Vector(pG, null, {
-					pointRadius: 16,
-					fillOpacity: 0.7,
+					pointRadius: 18,
+					fillOpacity: 1,
 					externalGraphic: iconImg,
+					label: t.id_penerima,
+					fontSize: "8px",
+					labelAlign: "cm",
+					strokeColor: "#00FF00",
+					strokeOpacity: 1,
+					strokeWidth: 3,
+					fillColor: "#FF5500",
+					pointerEvents: "visiblePainted",
+					fontWeight: "bold"
 				});
+				pF.attributes = {
+					name: t.id_penerima,
+					favColor: 'blue',
+					//align: 'lb',
+					align: "cm",
+					xOffset: 50,
+					yOffset: -15					
+				};				
 				pF.id = f_id;
 				pF.nama = f_nama;
 				tlokasi.push(pF);
 				strLayer.addFeatures(tlokasi);
 			  });
-			});	// end get data tahun
+			})
+			  .done(function() {
+				Ext.MessageBox.hide();
+			  })
+			  .fail(function() {
+				console.log( "error" );
+				Ext.MessageBox.hide();
+				Ext.MessageBox.alert("Status", "Gagal memuat data. Kesalahan koneksi jaringan.");				
+			  });			
 			strLayer.group = 'Tahun';
-			//gTahunLayer.push(strLayer);
-			peta.addLayer(strLayer);	
+			peta.addLayer(strLayer);
+			peta.setLayerIndex(strLayer, 99999);
 			strLayer.setVisibility(true);
-		  }); // end each
-		peta.addControl(new OpenLayers.Control.LayerSwitcherGroups());		
-		}); // end get_tahun		
+		  }); 
+		peta.addControl(new OpenLayers.Control.LayerSwitcherGroups());
+		}); 
 		/* end tahun */
-			
-    action = new GeoExt.Action({
+		
+		/*
+		this.pilih = new OpenLayers.Control.SelectFeature(
+			[],
+			{
+				'hover':true,
+				'callbacks': {
+				
+			}
+		});
+		*/
+		
+		OpenLayers.Handler.Feature.prototype.activate = function() {
+			var activated = false;
+			if (OpenLayers.Handler.prototype.activate.apply(this, arguments)) {
+				//this.moveLayerToTop();
+				this.map.events.on({
+					"removelayer": this.handleMapEvents,
+					"changelayer": this.handleMapEvents,
+					scope: this
+				});
+				activated = true;
+			}
+			return activated;
+		};
+		
+		action = new GeoExt.Action({
         control: new OpenLayers.Control.ZoomToMaxExtent(),
         map: peta,
         text: "max extent",
@@ -726,7 +794,7 @@ Ext.onReady(function() {
             new GeoExt.plugins.TreeNodeRadioButton({
                 listeners: {
                     "radiochange": function(node) {
-                        alert(node.text + " is now the active layer.");
+						Ext.MessageBox.alert("Status", node.text + " is now the active layer.");
                     }
                 }
             })

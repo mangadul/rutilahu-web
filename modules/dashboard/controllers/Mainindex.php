@@ -69,15 +69,10 @@
         $password = $this->input->post('password');
         $login    = $this->Mod_main->ProcessLogin($username,$password);
         if($login['count']){
-            $lokasi = $login['lokasi'];  
-            //$result = @mysql_query("SELECT nama_stn, daop FROM tabstn WHERE singk = '$lokasi'");
-            //$row = @mysql_fetch_array($result);
-            
+            $lokasi = $login['lokasi'];              
             $sessdata = array('op_login'    => '1',
                               'lokasi'      => $lokasi,
-                              //'daop'        => $row['daop'],
                               'jab'         => $login['jab'],
-                              //'nama_lokasi' => $row['nama_stn'],
                               'nipp'        => $login['nipp'],
                               'nama'        => $login['nama'],
                               'username'    => $username);
@@ -122,11 +117,6 @@
         $nipp = $this->input->post('nipp');
         $nama = $this->input->post('nama');
         
-       /*
-		$sql = "UPDATE `an_users` SET `password`=MD5('$password'), 
-							   `nipp`='$nipp', `nama`='$nama',`tag_change_passwd`='1' 
-						WHERE (`username`='$username')";
-		*/
 		$sql = "UPDATE `an_users` SET `password`=MD5('$password'),`tag_change_passwd`='1' 
 						WHERE (`username`='$username')";
 

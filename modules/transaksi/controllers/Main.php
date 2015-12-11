@@ -8,7 +8,7 @@ class Main extends CI_Controller {
 		
 		if(!$this->session->userdata('username'))
 		{
-			header("Location: index.php/dashboard/Mainindex/login");
+			header(sprintf("Location: %s", base_url().'index.php/dashboard/Mainindex/Logout'));
 		}
 		
     }
