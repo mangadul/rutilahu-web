@@ -6,18 +6,12 @@
     <link rel="icon" href="<?=base_url()?>/assets/images/logo_sm_2_mr_1.png" type="image/png">    
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="<?=base_url();?>assets/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-    <style type="text/css">
-    /**
- * parallax.css
- * @Author Original @msurguy -> http://bootsnipp.com/snippets/featured/parallax-login-form
- * @Reworked By @kaptenn_com 
- * @package PARALLAX LOGIN.
- */
-    
+    <style type="text/css">    
     body {
         background-color: #444;
-        /* background: url(http://s18.postimg.org/l7yq0ir3t/pick8_1.jpg); */
-        background: url(<?php echo base_url();?>assets/images/batik7.jpg);
+        background: url(<?php echo base_url();?>assets/images/map.png);
+		background-repeat:no-repeat;
+		background-size:cover;		
     }
     .form-signin input[type="text"] {
         margin-bottom: 5px;
@@ -81,7 +75,7 @@
                         <div class="panel panel-default">
                             <div class="panel-heading">                                
                                 <div class="row-fluid user-row">
-                                    <img src="<?=base_url();?>assets/images/logo_sm_2_mr_1.png" class="img-responsive" alt="Conxole Admin"/>
+                                    <img src="<?=base_url();?>assets/images/head-login.png" class="img-responsive" alt="Aplikasi Pendataan Rumah Tidak Layak Huni"/>
                                 </div>
                             </div>
                             <div class="panel-body">
@@ -103,26 +97,5 @@
             </div>
         </body>
             </div>
-	<script type="text/javascript">
-	/**
- * parallax.js
- * @Author original @msurguy (tw) -> http://bootsnipp.com/snippets/featured/parallax-login-form
- * @Tested on FF && CH
- * @Reworked by @kaptenn_com (tw)
- * @package PARALLAX LOGIN.
- */
-
-$(document).ready(function() {
-    $(document).mousemove(function(event) {
-        TweenLite.to($("body"), 
-        .5, {
-            css: {
-                backgroundPosition: "" + parseInt(event.pageX / 8) + "px " + parseInt(event.pageY / '12') + "px, " + parseInt(event.pageX / '15') + "px " + parseInt(event.pageY / '15') + "px, " + parseInt(event.pageX / '30') + "px " + parseInt(event.pageY / '30') + "px",
-            	"background-position": parseInt(event.pageX / 8) + "px " + parseInt(event.pageY / 12) + "px, " + parseInt(event.pageX / 15) + "px " + parseInt(event.pageY / 15) + "px, " + parseInt(event.pageX / 30) + "px " + parseInt(event.pageY / 30) + "px"
-            }
-        })
-    })
-})
-	</script>
 </body>
 </html>
