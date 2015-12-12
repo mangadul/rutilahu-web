@@ -380,6 +380,38 @@ class Main extends CI_Controller {
 		}			
 	}
 	
+	function get_kec_peta()
+	{
+		if($this->input->get('kab'))
+		{
+			$isdata = 0;
+			$sql = sprintf("select * from tbl_penerima where kode_kab = '%s'", $this->input->get('kab'));
+			$res = $this->db->query($sql)->result();
+			$isdata = $this->db->query($sql)->num_rows();
+			if($isdata)
+			{
+				echo json_encode(array('total'=>$isdata, 'data'=>$res));
+			} else echo json_encode(array('total'=>0, 'data'=>array()));
+		}
+	}
+
+	function get_kec_nama()
+	{
+		if($this->input->get('kab'))
+		{
+			$sql = sprintf("select kode_kecamatan, kecamatan from tbl_kecamatan where kode_kab='%s'", $this->input->get('kab'));
+			$data = $this->db->query($sql)->result();
+			echo json_encode($data);
+		}
+	}
+	
+	function get_kab_peta()
+	{
+		$sql = "select kode_kab, kabupaten from tbl_kabupaten";
+		$data = $this->db->query($sql)->result();
+		echo json_encode($data);
+	}
+	
 	function get_detail_penerima()
 	{
 		//$id = $this->get_sess_penerima();

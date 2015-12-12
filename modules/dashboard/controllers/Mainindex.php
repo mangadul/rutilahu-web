@@ -9,9 +9,7 @@
     }
         
     public function index()
-    {
-		//$this->session->set_userdata();
-		
+    {		
 	if($this->session->userdata('op_login')){ 
            $data['menu_root'] = $this->Mod_main->MenuRoot();
            $this->load->view('template', $data);
@@ -58,9 +56,12 @@
                               'username'    => '');
             $this->session->set_userdata($sessdata);
             $this->session->sess_destroy();
+			redirect('/dashboard/Mainindex/login', 'refresh');
+			/*
             echo "<script language = 'JavaScript'>
                     window.location = '".base_url()."index.php/dashboard/Mainindex/login';
                   </script>";
+			*/
     }
     
     public function process_login($tag)
@@ -79,25 +80,27 @@
             $this->session->set_userdata($sessdata);            
             if($tag) echo "1";  
             else {
-                if(!$login['tag_pwd']) 
-                    echo "<script> window.location = '".base_url()."index.php/mainindex/FormChangePassword'; </script>";
-                else echo "<script> window.location = '".base_url()."index.php'; </script>";
+                if(!$login['tag_pwd']) {
+					redirect('/dashboard/Mainindex/FormChangePassword', 'refresh');
+                    //echo "<script> window.location = '".base_url()."index.php/Mainindex/FormChangePassword'; </script>";					
+				}
+                else {
+					redirect('/dashboard/Mainindex/index', 'refresh');
+					//echo "<script> window.location = '".base_url()."index.php'; </script>";					
+				} 
             }
            
         } else {
              $sessdata = array('op_login'   => '',
-                              //'lokasi'      => '',
-                              //'daop'        => '',
                               'jab'         => '',
                               'nama_lokasi' => '',
                               'nipp'        => '',
                               'nama'        => '',
                               'username'    => '');
             $this->session->unset_userdata($sessdata);
-            //$this->session->set_userdata($sessdata);
-
             if($tag) echo "0"; 
-            else echo "<script language = 'JavaScript'>window.location = '".base_url()."index.php?errlog=1';</script>";
+            else redirect('/index.php?errlog=1', 'refresh');
+				//echo "<script language = 'JavaScript'>window.location = '".base_url()."index.php?errlog=1';</script>";
 		}        
     }
     
@@ -119,14 +122,15 @@
         
 		$sql = "UPDATE `an_users` SET `password`=MD5('$password'),`tag_change_passwd`='1' 
 						WHERE (`username`='$username')";
-
-        mysql_query($sql);
-        
-        echo "<script language = 'JavaScript'>window.location = '".base_url()."index.php/dashboard/Mainindex/logout';</script>";
+		if($this->db->query($sql))
+		{
+			redirect('/dashboard/Mainindex/logout','refresh');
+			//echo "<script language = 'JavaScript'>window.location = '".base_url()."index.php/dashboard/Mainindex/logout';</script>";
+		}
     }
     
     public function CekLogin(){
-        if($this->session->userdata('lokasi'))echo 1;
+        if($this->session->userdata('username')) echo 1;
         else echo 0;
     }
     
