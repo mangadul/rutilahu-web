@@ -382,10 +382,10 @@ class Main extends CI_Controller {
 	
 	function get_kec_peta()
 	{
-		if($this->input->get('kab'))
+		if($this->input->get('kec'))
 		{
 			$isdata = 0;
-			$sql = sprintf("select * from tbl_penerima where kode_kab = '%s'", $this->input->get('kab'));
+			$sql = sprintf("select * from tbl_penerima where kode_kec = '%s'", $this->input->get('kec'));
 			$res = $this->db->query($sql)->result();
 			$isdata = $this->db->query($sql)->num_rows();
 			if($isdata)

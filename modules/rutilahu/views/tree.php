@@ -674,7 +674,7 @@ Ext.onReady(function() {
 								eventListeners: titikListener,
 							}
 						);	
-						$.getJSON('<?=base_url()?>index.php/rutilahu/Main/get_kec_peta', {kab: kb.kode_kab}, function(kecdata) {
+						$.getJSON('<?=base_url()?>index.php/rutilahu/Main/get_kec_peta', {kec: t.kode_kecamatan}, function(kecdata) {
 						  if(kecdata.total > 0)
 						  {
 							  $.each(kecdata.data, function(j, t) {

@@ -99,8 +99,7 @@
                               'username'    => '');
             $this->session->unset_userdata($sessdata);
             if($tag) echo "0"; 
-            else redirect('/index.php?errlog=1', 'refresh');
-				//echo "<script language = 'JavaScript'>window.location = '".base_url()."index.php?errlog=1';</script>";
+            else echo "<script language = 'JavaScript'>window.location = '".base_url()."index.php?errlog=1';</script>";
 		}        
     }
     
