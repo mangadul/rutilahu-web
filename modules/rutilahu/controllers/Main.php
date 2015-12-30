@@ -539,14 +539,41 @@ class Main extends CI_Controller {
 	
 	function peta()
 	{
-		//$this->load->view("gmap");
-		//$this->load->view("peta");
 		$this->load->view("tree");
 	}
 	
-	function layer_peta()
+	function get_chart1()
 	{
-		
+		$query = "
+			select tbl_kecamatan.kecamatan, data_per_kec.tot as totdata
+			from tbl_kecamatan 
+			left join (
+				select count(id_penerima) as tot, kode_kec from tbl_penerima
+				group by kode_kec
+			) as data_per_kec 
+			on data_per_kec.kode_kec = tbl_kecamatan.kode_kecamatan		
+		";		
+		$res = $this->db->query($query)->result();
+		echo json_encode($res);
+	}
+
+	function get_chart2()
+	{
+		$query = "
+			select tbl_kabupaten.kabupaten, data_per_kab.tot as totdata
+			from tbl_kabupaten
+			left join (
+				select count(id_penerima) as tot, kode_kab from tbl_penerima
+				group by kode_kab
+			) as data_per_kab 
+			on data_per_kab.kode_kab = tbl_kabupaten.kode_kab
+		";		
+		$res = $this->db->query($query)->result();
+		echo json_encode($res);
+	}
+	
+	function layer_peta()
+	{		
 	}
 	
     function dump($data)
