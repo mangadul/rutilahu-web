@@ -40,19 +40,18 @@ Ext.onReady(function(){
 	
     var required = '<span style="color:red;font-weight:bold" data-qtip="Required">*</span>';
 	
-    Ext.define('mdl_desa', {
+    Ext.define('mdl_zona', {
         extend: 'Ext.data.Model',
-        fields: ['id_kelurahan', 'id_kecamatan', 'desa_kelurahan', 'kecamatan', 'kabupaten','provinsi',
-		'id_kabupaten', 'kode_prov', 'kode_kab', 'kode_kec', 'kode_desa'],
-        idProperty: 'id_kelurahan'
+        fields: ['id_zona','zona','jarak_meter','ket'],
+        idProperty: 'id_zona'
     });
 	
-    var store_desa = Ext.create('Ext.data.Store', {
+    var store_zona = Ext.create('Ext.data.Store', {
         pageSize: 50,
-        model: 'mdl_desa',
+        model: 'mdl_zona',
         remoteSort: true,
         proxy: {
-            url: '<?=base_url()?>index.php/transaksi/Master/get_desa',
+            url: '<?=base_url()?>index.php/transaksi/Master/get_zona',
             simpleSortMode: true,
 			type: 'ajax',
 			reader: {
@@ -64,35 +63,33 @@ Ext.onReady(function(){
 			limit: 100,
 		},		
         sorters: [{
-            property: 'id_kelurahan',
+            property: 'id_zona',
             direction: 'DESC'
         }]
     });
 	
-	var APcellEditing_m_desa = Ext.create('Ext.grid.plugin.RowEditing', {
+	var APcellEditing_m_zona = Ext.create('Ext.grid.plugin.RowEditing', {
 		//clicksToEdit: 1,
 		clicksToMoveEditor: 1,
 		autoCancel: false,
 		listeners : {
 			'edit' : function() {						
-				var editedRecords = grid_m_desa.getView().getSelectionModel().getSelection();
+				var editedRecords = grid_m_zona.getView().getSelectionModel().getSelection();
 				Ext.Ajax.request({
-					url: '<?=base_url();?>index.php/transaksi/Master/simpan_master_data/tbl_desa/id_kelurahan/desa_kelurahan',
+					url: '<?=base_url();?>index.php/transaksi/Master/simpan_master_data/tbl_peta_zonasi/id_zona/zona',
 					method: 'POST',
 					params: {
-						'id_kelurahan': editedRecords[0].data.id_kelurahan,
-						'desa_kelurahan': editedRecords[0].data.desa_kelurahan,
-						'kode_desa': editedRecords[0].data.kode_desa,
-						'kode_kab': editedRecords[0].data.kode_kab,
-						'kode_kec': editedRecords[0].data.kode_kec,
-						'kode_prov': editedRecords[0].data.kode_prov,
+						'id_zona': editedRecords[0].data.id_zona,
+						'zona': editedRecords[0].data.zona,
+						'jarak_meter': editedRecords[0].data.jarak_meter,
+						'ket': editedRecords[0].data.ket,
 					},								
 					success: function(response) {
 						var text = response.responseText;
 						Ext.MessageBox.alert('Status', response.responseText, function(btn,txt){
 							if(btn == 'ok')
 							{
-								store_desa.load();
+								store_zona.load();
 							}
 						}
 						);
@@ -105,9 +102,8 @@ Ext.onReady(function(){
 		}
 	});			
 
-var grid_m_desa = Ext.create('Ext.grid.Panel', {
-	title: 'Master Data Desa',
-	store: store_desa,
+var grid_m_zona = Ext.create('Ext.grid.Panel', {
+	store: store_zona,
 	disableSelection: false,
 	loadMask: true,
 	selModel: Ext.create('Ext.selection.CheckboxModel', {
@@ -119,18 +115,13 @@ var grid_m_desa = Ext.create('Ext.grid.Panel', {
 		trackOver: true,
 		stripeRows: true,
 	},
-	plugins: [APcellEditing_m_desa],
+	plugins: [APcellEditing_m_zona],
 	columns:[
 		{xtype: 'rownumberer', width: 35, sortable: false},
-		{text: "id_kelurahan",dataIndex: 'id_kelurahan',width: 70,sortable: false,},				
-		{text: "kode_desa",dataIndex: 'kode_desa',flex: 1,sortable: false, editor: {xtype: 'textfield',allowBlank:false}},
-		{text: "desa_kelurahan",dataIndex: 'desa_kelurahan',width: 200,sortable: false, editor: {xtype: 'textfield',allowBlank:false}},
-		{text: "kecamatan",dataIndex: 'kecamatan',width: 200,sortable: false,},
-		{text: "kabupaten",dataIndex: 'kabupaten',width: 200,sortable: false,},
-		{text: "provinsi",dataIndex: 'provinsi',flex: 1,sortable: false,},
-		{text: "kode_kec",dataIndex: 'kode_kec',flex: 1,sortable: false, editor: {xtype: 'textfield',allowBlank:false}},
-		{text: "kode_kab",dataIndex: 'kode_kab',flex: 1,sortable: false, editor: {xtype: 'textfield',allowBlank:false}},
-		{text: "kode_prov",dataIndex: 'kode_prov',flex: 1,sortable: false, editor: {xtype: 'textfield',allowBlank:false}},
+		{text: "id_zona",dataIndex: 'id_zona',sortable: false,},				
+		{text: "zona",dataIndex: 'zona',flex: 1,sortable: false, editor: {xtype: 'textfield',allowBlank:false}},
+		{text: "jarak_meter",dataIndex: 'jarak_meter',flex: 1,sortable: false, editor: {xtype: 'textfield',allowBlank:false}},
+		{text: "ket",dataIndex: 'ket',flex: 1,sortable: false, editor: {xtype: 'textfield',allowBlank:false}},
 	],
 	dockedItems: [
 	{
@@ -142,20 +133,20 @@ var grid_m_desa = Ext.create('Ext.grid.Panel', {
 			text:'Tambah Data',
 			iconCls: 'icon-add',
 			handler: function(){          
-				var r = Ext.create('mdl_desa', {
-					desa_kelurahan : '[NAMA-DESA-KELURAHAN]',
+				var r = Ext.create('mdl_zona', {
+					zona : '[ZONA]',
 				});
-				store_desa.insert(0, r);
-				APcellEditing_m_desa.startEdit(0, 0);									
+				store_zona.insert(0, r);
+				APcellEditing_m_zona.startEdit(0, 0);									
 			}
 		},
 		{
 			text:'Delete',
 			iconCls: 'icon-del',
 			handler: function() {          
-				var records = grid_m_desa.getView().getSelectionModel().getSelection(), id=[];
+				var records = grid_m_zona.getView().getSelectionModel().getSelection(), id=[];
 				Ext.Array.each(records, function(rec){
-					id.push(rec.get('id_kelurahan'));
+					id.push(rec.get('id_zona'));
 				});
 				if(id != '')
 				{
@@ -164,7 +155,7 @@ var grid_m_desa = Ext.create('Ext.grid.Panel', {
 					if(resbtn == 'yes')
 					{
 						Ext.Ajax.request({
-							url: '<?=base_url();?>index.php/transaksi/Master/master_delet/tbl_desa/id_kelurahan',
+							url: '<?=base_url();?>index.php/transaksi/Master/master_delet/tbl_peta_zonasi/id_zona',
 							method: 'POST',											
 							params: {												
 								'id' : id.join(','),
@@ -172,14 +163,17 @@ var grid_m_desa = Ext.create('Ext.grid.Panel', {
 							success: function(response) {
 								Ext.MessageBox.alert('OK', response.responseText, function()
 								{
-									store_desa.load();
+									store_zona.load();
 								});
 							},
 							failure: function(response) {
 								Ext.MessageBox.alert('Failure', 'Insert Data Error due to connection problem, or duplicate entries!');
 							}
 						});			   	
-					} 
+					} else 
+					{
+						Ext.MessageBox.alert('Error', 'Silahkan pilih item yang mau dihapus!');
+					}																		
 				});
 				} else 
 				{
@@ -191,35 +185,35 @@ var grid_m_desa = Ext.create('Ext.grid.Panel', {
 			text:'Refresh',
 			iconCls: 'icon-reload',
 			handler: function(){          
-				store_desa.load();
+				store_zona.load();
 			}
 		},'->',
 		{
 			xtype: 'searchfield',
 			remoteFilter: true,
-			store: store_desa,
+			store: store_zona,
 			id: 'searchField',
-			emptyText: 'Nama Desa / Kelurahan, Kecamatan, Kabupaten',
+			emptyText: 'Zona / Ket / Jarak',
 			width: '30%',
 		},		
 		]
 	}],
    bbar: Ext.create('Ext.PagingToolbar',{
-		store: store_desa,
+		store: store_zona,
 		displayInfo: true,
 		displayMsg: 'Displaying Data : {0} - {1} of {2}',
 		emptyMsg: "No Display Data"
 	}),	
 	listeners:{
 		beforerender:function(){
-			store_desa.load();
+			store_zona.load();
 		}
 	}			
 });
 	
     Ext.create('Ext.container.Viewport', {
         layout: 'fit',
-        items: [grid_m_desa]
+        items: [grid_m_zona]
     });
 	
 

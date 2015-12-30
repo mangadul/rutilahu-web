@@ -173,21 +173,26 @@ var grid_m_penerima = Ext.create('Ext.grid.Panel', {
 			text:'Kosongkan Data',
 			iconCls: 'icon-del',
 			handler: function(){    
-				Ext.Ajax.request({
-					url: '<?=base_url();?>index.php/rutilahu/Main/kosongkan_tbl_temp_upload',
-					method: 'POST',
-					params: {
-						'proses' : 1,
-					},								
-					success: function(response) {
-						Ext.MessageBox.alert('Status', response.responseText, function(btn,txt){
-							if(btn == 'ok')
-							{
-								store_penerima.load();
+				Ext.MessageBox.confirm('Konfirmasi penghapusan', 'Apakah anda akan menghapus data?', function(btn){
+					if(btn == 'yes')
+					{
+						Ext.Ajax.request({
+							url: '<?=base_url();?>index.php/rutilahu/Main/kosongkan_tbl_temp_upload',
+							method: 'POST',
+							params: {
+								'proses' : 1,
+							},								
+							success: function(response) {
+								Ext.MessageBox.alert('Status', response.responseText, function(btn,txt){
+									if(btn == 'ok')
+									{
+										store_penerima.load();
+									}
+								});							
 							}
-						});							
-					}
-				})
+						});						
+					}					
+				});
 			}
 		},'->',
 		{

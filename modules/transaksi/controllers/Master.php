@@ -15,84 +15,6 @@ class Master extends CI_Controller {
     public function index() {
     }
 
-    function get_data_SA()
-    {
-        $sql = $this->db->query('select * from m_sa');
-		if ($sql->num_rows() > 0) {
-			$res = $sql->result_array();
-			echo json_encode(array('total'=>$sql->num_rows(), 'data'=>$res));
-		} else echo json_encode(array('total'=>0, 'data'=>''));
-    }
-
-    function get_detail_SA()
-    {
-        $sql = $this->db->query(sprintf('
-				select t_sa.*,m_sa.NO_SA from t_sa 
-				inner join m_sa on (m_sa.id_sa = t_sa.id_sa)
-				where t_sa.id_sa = "%d"
-			', $this->session->userdata('ID_SA')));
-		if ($sql->num_rows() > 0) {
-			$res = $sql->result_array();
-			echo json_encode(array('total'=>$sql->num_rows(), 'data'=>$res));
-		} else echo json_encode(array('total'=>0, 'data'=>''));
-    }
-	
-	function get_sa_client()
-	{
-		$query = "
-			select id_sa_client, 
-			concat(sa_client_code,' - ', sa_company) as klien
-			from m_sa_client
-		";
-		$this->getData($query);
-	}
-
-	function get_sales_office()
-	{
-		$query = "
-			select ID_SO, 
-			concat(SO_CODE,' - ', SO_NAME) as SALES_OFFICE
-			from m_sales_office
-		";
-		$this->getData($query);
-	}
-
-	function get_sales_group()
-	{
-		$query = "
-			select ID_SG, 
-			concat(SG_CODE,' - ', SG_NAME) as SALES_GROUP
-			from m_sales_group
-		";
-		$this->getData($query);
-	}
-
-	function get_uom()
-	{
-		$query = "
-			select ID_UOM, 
-			concat(CODE_UOM_SA,' - ', DESC_UOM_SA) as UOM
-			from m_uom
-		";
-		$this->getData($query);
-	}
-
-	function get_spbbe()
-	{
-		$query = "
-			select ID_SPBBE, 
-			concat(KODE_SPBBE,' - ', NAMA_SPBBE) as NAMA_SPBBE
-			from m_spbbe
-		";
-		$this->getData($query);
-	}
-
-	function get_supir()
-	{
-		$query = "select * from m_driver";
-		$this->getData($query);
-	}
-
 	function get_bulan()
 	{
 		$query = "select * from m_bulan";
@@ -111,44 +33,6 @@ class Master extends CI_Controller {
 		echo json_encode(array('total'=>count($thn), 'data'=>$thn));
 	}
 
-	function get_kendaraan()
-	{
-		$query = "select ID_KENDARAAN, NOPOL_VHC from m_kendaraan";
-		$this->getData($query);
-	}
-
-	function get_sa_id()
-	{
-		$query = "select ID_SA, NO_SA from m_sa";
-		$this->getData($query);
-	}
-
-	/*
-	
-	function get_provinsi()
-	{
-		$query = "select * from m_provinsi where id_provinsi=32";
-		$this->getData($query);
-	}
-
-	function get_kabupaten()
-	{
-		$query = "select * from m_kabupaten where id_provinsi = 32";
-		$this->getData($query);
-	}
-
-	function get_kecamatan()
-	{
-		$query = sprintf("select * from m_kecamatan where kode_kabupaten = '%s' and kode_provinsi = 32", $this->session->userdata('KODE_KAB'));
-		$this->getData($query);
-	}
-	function get_desa()
-	{
-		$query = sprintf("select * from m_desa where kode_kecamatan = '%s' AND kode_kabupaten = '%s' AND kode_provinsi = 32", $this->session->userdata('KODE_KEC'), $this->session->userdata('KODE_KAB'));
-		$this->getData($query);
-	}
-	*/
-
 	function set_sess_kab()
 	{
 		$this->session->set_userdata('KODE_KAB', $this->input->post('KODE_KAB'));
@@ -157,26 +41,6 @@ class Master extends CI_Controller {
 	function set_sess_kec()
 	{
 		$this->session->set_userdata('KODE_KEC', $this->input->post('KODE_KEC'));		
-	}
-
-	function get_tipe_penyalur()
-	{
-		$query = "select * from m_tipe_penyalur";
-		$this->getData($query);		
-	}
-	
-	function get_penyalur(){
-		$query = "select ID_PENYALUR, SUB_PENYALUR from m_penyalur";
-		$this->getData($query);				
-	}
-	
-	function get_lo(){
-		$query = sprintf("
-			select distinct(no_lo) as NO_LO
-			from t_realisasi_pengambilan_do 
-			where BULAN_REALISASI = %d and TAHUN_REALISASI = %d		
-		", date("m"), date("Y"));
-		$this->getData($query);
 	}
 	
 	function getData($query, $w, $orderby)
@@ -308,7 +172,7 @@ class Master extends CI_Controller {
 			INNER JOIN tbl_provinsi on tbl_provinsi.kode_provinsi = tbl_kecamatan.kode_prov
 			WHERE 1
 		";
-		$this->getData($query, array("tbl_kecamatan.kecamatan", "tbl_kabupaten.kabupaten"), "tbl_kecamatan.id_kec");		
+		$this->getData($query, array("tbl_kecamatan.kecamatan", "tbl_kabupaten.kabupaten"), "tbl_kecamatan.id");		
 	}
 
 	function get_kabupaten()
@@ -321,7 +185,7 @@ class Master extends CI_Controller {
 			INNER JOIN tbl_provinsi on tbl_provinsi.kode_provinsi = tbl_kabupaten.kode_prov
 			WHERE 1
 		";
-		$this->getData($query, array("tbl_kabupaten.kabupaten"), "tbl_kabupaten.id_kab");
+		$this->getData($query, array("tbl_kabupaten.kabupaten"), "tbl_kabupaten.id");
 	}
 
 	function get_penerima()
@@ -333,9 +197,43 @@ class Master extends CI_Controller {
 		$this->getData($query, array("tbl_temp_penerima.namalengkap"), "tbl_temp_penerima.id_penerima");
 	}
 	
+	function get_perangkat()
+	{
+		$query = "select * from tbl_device where 1";
+		$this->getData($query, array("id_device","imei","tipe_handset"), "id_device");
+	}
+
+	function get_user()
+	{
+		$query = "select * from an_users where 1";
+		$this->getData($query, array("username","nama"), "id");
+	}
+
+	function get_titiktengah()
+	{
+		$query = "select * from tbl_peta_titik_tengah where 1";
+		$this->getData($query, array("titik_tengah_long","titik_tengah_long"), "titik_tengah_long");
+	}
+
+	function get_zona()
+	{
+		$query = "select * from tbl_peta_zonasi where 1";
+		$this->getData($query, array("id_zona","zona","jarak_meter","ket"), "id_zona");
+	}
+	
 	function m_desa()
 	{
 		$this->load->view('master_desa');
+	}
+	
+	function m_zona()
+	{
+		$this->load->view('master_zona');
+	}
+
+	function m_titik_tengah()
+	{
+		$this->load->view('master_titiktengah');
 	}
 	
 	function m_kecamatan()
@@ -353,40 +251,16 @@ class Master extends CI_Controller {
 		$this->load->view('master_penerima');
 	}
 
-	function m_perangkat()
+	function m_user()
+	{
+		$this->load->view('master_user');
+	}
+	
+	function m_device()
 	{
 		$this->load->view('master_perangkat');
 	}
 	
-	function m_uom()
-	{
-		$this->load->view('master_uom');
-	}
-
-	function m_kendaraan()
-	{
-		$this->load->view('master_kendaraan');
-	}
-
-	function m_supir()
-	{
-		$this->load->view('master_supir');
-	}
-
-	function m_sa_client()
-	{
-		$this->load->view('master_sa_client');
-	}
-
-	function m_sales_office()
-	{
-		$this->load->view('master_sa_so');
-	}
-
-	function m_sales_group()
-	{
-		$this->load->view('master_sa_sg');
-	}
 	
 	function get_master_data($table){
 		$query = sprintf("select * from `%s`", $table);
@@ -445,7 +319,18 @@ class Master extends CI_Controller {
 			} else echo "Data GAGAL dihapus.";
 		}
 	}
-	
+
+	function master_delet($table,$id)
+	{
+		if(isset($table) && isset($id))
+		{
+			if($this->db->delete(sprintf('%s', $table),sprintf('%s in(%s)', $id, $this->input->post('id'))))
+			{
+				echo "Data berhasil dihapus.";
+			} else echo "Data GAGAL dihapus.";			
+		}
+	}
+
 	function _dump($data){
 		print('<pre>');
 		print_r($data);

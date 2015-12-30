@@ -112,7 +112,7 @@ Ext.onReady(function() {
 		numZoomLevels: 20,
 		maxResolution: 'auto',		
 		units: 'm',
-		displayProjection: new OpenLayers.Projection("EPSG:4326"),		
+		displayProjection: new OpenLayers.Projection("EPSG:4326"),
 		controls: [ 
 			new OpenLayers.Control.PanZoom(), 
 			new OpenLayers.Control.Navigation(),
@@ -504,33 +504,35 @@ Ext.onReady(function() {
 			
 			var google_hybrid = new OpenLayers.Layer.Google(
 				"Google Hybrid",
-				{type: google.maps.MapTypeId.HYBRID, visibility: true}
+				{type: google.maps.MapTypeId.HYBRID, visibility: false}
 			);
-
-			peta.addLayer(google_hybrid);
-			peta.setCenter(new OpenLayers.LonLat(104.4803663, 1.0898176).transform(
-			this.pj_epsg_4326,
-			this.pj_epsg_900913), 10);
 			
 			var google_roadmap = new OpenLayers.Layer.Google(
 				"Google Roadmap",
 				{type: google.maps.MapTypeId.ROADMAP, visibility: true}
 			);
-			
-			var google_physical = new OpenLayers.Layer.Google(
-				"Google Physical",
-				{type: google.maps.MapTypeId.PHYSICAL}
-			);
-			 
+						 
 			var google_satellite = new OpenLayers.Layer.Google(
 				"Google Satellite",
 				{type: google.maps.MapTypeId.SATELLITE}
 			);
-						 								   
+
+			peta.addLayer(google_roadmap);
+			peta.setCenter(new OpenLayers.LonLat(104.4803663, 1.0898176).transform(
+			this.pj_epsg_4326,
+			this.pj_epsg_900913), 10);
+
+			/*
+			var google_physical = new OpenLayers.Layer.Google(
+				"Google Physical",
+				{type: google.maps.MapTypeId.PHYSICAL}
+			);
+			
 			var google_terrain = new OpenLayers.Layer.Google(
 				"Google Terrain",
 				{type: google.maps.MapTypeId.TERRAIN}
 			);
+			*/
 		
 		var lonlat_ = [104.4803663, 1.0898176];
 		var zpj_epsg_900913 = new OpenLayers.Projection("EPSG:900913");
@@ -756,6 +758,13 @@ Ext.onReady(function() {
 			return activated;
 		};
 			
+		peta.events.register('zoomend', peta, function() {
+			//var extend = peta.getExtent().transform(peta.projection, peta.displayProjection);
+			var extend = peta.getExtent().transform(new OpenLayers.Projection("EPSG:4326"), peta.getProjectionObject());
+			var zoomInfo = 'Zoom level=' + peta.getZoom() + '/' + (peta.numZoomLevels + 1);
+			console.log("extent: "+extend, " zoom level: "+zoomInfo);
+		});
+			
 	action = new GeoExt.Action({
 		control: new OpenLayers.Control.ZoomToMaxExtent(),
 		map: peta,
@@ -844,111 +853,17 @@ Ext.onReady(function() {
         map: peta,
         center: slonLat,
         zoom: 10,
-        layers: [google_roadmap, google_physical, google_satellite, google_terrain, osm], //pointLayer, 
+        layers: [google_satellite,google_roadmap], //pointLayer, google_roadmap, google_physical, google_satellite, google_terrain, osm
 		tbar: toolbarItems
     });
-	
-    var LayerNodeUI = Ext.extend(GeoExt.tree.LayerNodeUI, new GeoExt.tree.TreeNodeUIEventMixin());
-        
-    var treeConfig = [
-		{
-			nodeType: "gx_baselayercontainer"
-		}, 
-		{
-			nodeType: "gx_overlaylayercontainer",
-			expanded: true,
-			loader: {
-				baseAttrs: {
-					radioGroup: "foo",
-					uiProvider: "layernodeui"
-				}
-			}
-		},
-	];
-    treeConfig = new OpenLayers.Format.JSON().write(treeConfig, true);
-    // create the tree with the configuration from above
-    tree = new Ext.tree.TreePanel({
-        border: true,
-        region: "west",
-        title: "Layers",
-        width: 200,
-        split: true,
-        collapsible: true,
-        collapseMode: "mini",
-        autoScroll: true,
-        plugins: [
-            new GeoExt.plugins.TreeNodeRadioButton({
-                listeners: {
-                    "radiochange": function(node) {
-						Ext.MessageBox.alert("Status", node.text + " is now the active layer.");
-                    }
-                }
-            })
-        ],
-        loader: new Ext.tree.TreeLoader({
-            applyLoader: false,
-            uiProviders: {
-                "layernodeui": LayerNodeUI
-            },
-        }),
-        root: {
-            nodeType: "async",
-            children: Ext.decode(treeConfig)			
-        },
-        listeners: {
-            "radiochange": function(node){
-                alert(node.layer.name + " is now the the active layer.");
-            }
-        },
-        rootVisible: false,
-        lines: false,
-    });
-
-    var treeConfigWin = new Ext.Window({
-        layout: "fit",
-        hideBorders: true,
-        closeAction: "hide",
-        width: 300,
-        height: 400,
-        title: "Tree Configuration",
-        items: [{
-            xtype: "form",
-            //layout: "fit",
-            items: [{
-                id: "treeconfig",
-                xtype: "textarea"
-            }],
-            buttons: [{
-                text: "Save",
-                handler: function() {
-                    var value = Ext.getCmp("treeconfig").getValue()
-                    try {
-                        var root = tree.getRootNode();
-                        root.attributes.children = Ext.decode(value);
-                        tree.getLoader().load(root);
-                    } catch(e) {
-                        alert("Invalid JSON");
-                        return;
-                    }
-                    treeConfig = value;
-                    treeConfigWin.hide();
-                }
-            }, {
-                text: "Cancel",
-                handler: function() {
-                    treeConfigWin.hide();
-                }
-            }]
-        }]
-    });
-    	
+	    	
     new Ext.Viewport({
         layout: "fit",
         hideBorders: true,
         items: {
             layout: "border",
             deferredRender: false,
-            items: [mapPanel, tree]
+            items: [mapPanel]
         }
     });
 });		

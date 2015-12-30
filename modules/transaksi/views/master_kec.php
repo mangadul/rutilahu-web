@@ -42,8 +42,8 @@ Ext.onReady(function(){
 	
     Ext.define('mdl_kec', {
         extend: 'Ext.data.Model',
-        fields: ['id_kab','id_kec','kecamatan','kabupaten', 'provinsi','kode_kecamatan', 'kode_prov','kode_kab'],
-        idProperty: 'id_kec'
+        fields: ['id_kab','id','kecamatan','kabupaten', 'provinsi','kode_kecamatan', 'kode_prov','kode_kab'],
+        idProperty: 'id'
     });
 	
     var store_kec = Ext.create('Ext.data.Store', {
@@ -63,7 +63,7 @@ Ext.onReady(function(){
 			limit: 100,
 		},		
         sorters: [{
-            property: 'id_kec',
+            property: 'id',
             direction: 'DESC'
         }]
     });
@@ -76,10 +76,10 @@ Ext.onReady(function(){
 			'edit' : function() {						
 				var editedRecords = grid_m_kec.getView().getSelectionModel().getSelection();
 				Ext.Ajax.request({
-					url: '<?=base_url();?>index.php/transaksi/Master/simpan_master_data/tbl_kecamatan/id_kec/kecamatan',
+					url: '<?=base_url();?>index.php/transaksi/Master/simpan_master_data/tbl_kecamatan/id/kecamatan',
 					method: 'POST',
 					params: {
-						'id_kec': editedRecords[0].data.id_kec,
+						'id': editedRecords[0].data.id,
 						'kecamatan': editedRecords[0].data.kecamatan,
 						'kode_kecamatan':editedRecords[0].data.kode_kecamatan,
 						'kode_kab':editedRecords[0].data.kode_kab,
@@ -120,7 +120,7 @@ var grid_m_kec = Ext.create('Ext.grid.Panel', {
 	plugins: [APcellEditing_m_kec],
 	columns:[
 		{xtype: 'rownumberer', width: 35, sortable: false},
-		{text: "id_kec",dataIndex: 'id_kec',width: 70,sortable: false,},				
+		{text: "id",dataIndex: 'id',width: 70,sortable: false,},				
 		{text: "kode_kecamatan",dataIndex: 'kode_kecamatan',flex: 1,sortable: false, editor: {xtype: 'textfield',allowBlank:false}},
 		{text: "kecamatan",dataIndex: 'kecamatan',flex: 1,sortable: false, editor: {xtype: 'textfield',allowBlank:false}},
 		{text: "kode_kab",dataIndex: 'kode_kab',flex: 1,sortable: false, editor: {xtype: 'textfield',allowBlank:false}},
@@ -151,7 +151,7 @@ var grid_m_kec = Ext.create('Ext.grid.Panel', {
 			handler: function() {          
 				var records = grid_m_kec.getView().getSelectionModel().getSelection(), id=[];
 				Ext.Array.each(records, function(rec){
-					id.push(rec.get('id_kec'));
+					id.push(rec.get('id'));
 				});
 				if(id != '')
 				{
@@ -160,10 +160,10 @@ var grid_m_kec = Ext.create('Ext.grid.Panel', {
 					if(resbtn == 'yes')
 					{
 						Ext.Ajax.request({
-							url: '<?=base_url();?>index.php/transaksi/Master/master_del/tbl_kecamatan/id_kec',
+							url: '<?=base_url();?>index.php/transaksi/Master/master_del/tbl_kecamatan/id',
 							method: 'POST',											
 							params: {												
-								'id_kec' : id.join(','),
+								'id' : id.join(','),
 							},								
 							success: function(response) {
 								Ext.MessageBox.alert('OK', response.responseText, function()

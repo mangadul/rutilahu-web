@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<title>Master Kabupaten</title>
+<title>Master Desa</title>
 <script type="text/javascript" src="<?=base_url()?>resources/ext4/examples/shared/include-ext.js"></script>
 <style>
 .icon-print-preview { background-image:url(<?=base_url(); ?>assets/images/txt.png) !important; }
@@ -40,18 +40,18 @@ Ext.onReady(function(){
 	
     var required = '<span style="color:red;font-weight:bold" data-qtip="Required">*</span>';
 	
-    Ext.define('mdl_kab', {
-        extend: 'Ext.data.Model',		
-        fields: ['id_prov','id','kabupaten','kode_kab','provinsi', 'kode_prov'],
-        idProperty: 'id'
+    Ext.define('mdl_peta', {
+        extend: 'Ext.data.Model',
+        fields: ['titik_tengah_long', 'titik_tengah_lat'],
+        //idProperty: 'id_device'
     });
 	
-    var store_kab = Ext.create('Ext.data.Store', {
+    var store_tt = Ext.create('Ext.data.Store', {
         pageSize: 50,
-        model: 'mdl_kab',
+        model: 'mdl_peta',
         remoteSort: true,
         proxy: {
-            url: '<?=base_url()?>index.php/transaksi/Master/get_kabupaten',
+            url: '<?=base_url()?>index.php/transaksi/Master/get_titiktengah',
             simpleSortMode: true,
 			type: 'ajax',
 			reader: {
@@ -63,34 +63,31 @@ Ext.onReady(function(){
 			limit: 100,
 		},		
         sorters: [{
-            property: 'id',
+            property: 'id_kelurahan',
             direction: 'DESC'
         }]
     });
 	
-	var APcellEditing_m_kab = Ext.create('Ext.grid.plugin.RowEditing', {
+	var APcellEditing_m_dev = Ext.create('Ext.grid.plugin.RowEditing', {
 		//clicksToEdit: 1,
 		clicksToMoveEditor: 1,
 		autoCancel: false,
 		listeners : {
 			'edit' : function() {						
-				var editedRecords = grid_m_kab.getView().getSelectionModel().getSelection();
+				var editedRecords = grid_m_tt.getView().getSelectionModel().getSelection();
 				Ext.Ajax.request({
-					url: '<?=base_url();?>index.php/transaksi/Master/simpan_master_data/tbl_kabupaten/id/kabupaten',
+					url: '<?=base_url();?>index.php/transaksi/Master/simpan_master_data/tbl_peta_titik_tengah/titik_tengah_lat',
 					method: 'POST',
 					params: {
-						'id': editedRecords[0].data.id,
-						'kabupaten': editedRecords[0].data.kabupaten,
-						'kode_kab':editedRecords[0].data.kode_kab,
-						'id_prov':editedRecords[0].data.id_prov,
-						'kode_prov':editedRecords[0].data.kode_prov,
+						'titik_tengah_lat': editedRecords[0].data.titik_tengah_lat,
+						'titik_tengah_long': editedRecords[0].data.titik_tengah_long,
 					},								
 					success: function(response) {
 						var text = response.responseText;
 						Ext.MessageBox.alert('Status', response.responseText, function(btn,txt){
 							if(btn == 'ok')
 							{
-								store_kab.load();
+								store_tt.load();
 							}
 						}
 						);
@@ -103,9 +100,8 @@ Ext.onReady(function(){
 		}
 	});			
 
-var grid_m_kab = Ext.create('Ext.grid.Panel', {
-	title: 'Master Data Kabupaten',
-	store: store_kab,
+var grid_m_tt = Ext.create('Ext.grid.Panel', {
+	store: store_tt,
 	disableSelection: false,
 	loadMask: true,
 	selModel: Ext.create('Ext.selection.CheckboxModel', {
@@ -117,15 +113,11 @@ var grid_m_kab = Ext.create('Ext.grid.Panel', {
 		trackOver: true,
 		stripeRows: true,
 	},
-	plugins: [APcellEditing_m_kab],
+	plugins: [APcellEditing_m_dev],
 	columns:[
 		{xtype: 'rownumberer', width: 35, sortable: false},
-		{text: "id",dataIndex: 'id',width: 70,sortable: false,},				
-		{text: "kode_kab",dataIndex: 'kode_kab',flex: 1,sortable: false, editor: {xtype: 'textfield',allowBlank:false}},
-		{text: "kode_prov",dataIndex: 'kode_prov',flex: 1,sortable: false, editor: {xtype: 'textfield',allowBlank:false}},
-		{text: "kabupaten",dataIndex: 'kabupaten',flex: 1,sortable: false, editor: {xtype: 'textfield',allowBlank:false}},
-		{text: "provinsi",dataIndex: 'provinsi',flex: 1,sortable: false, editor: {xtype: 'textfield',allowBlank:false}},
-		{text: "id_prov",dataIndex: 'id_prov',flex: 1,sortable: false, editor: {xtype: 'textfield',allowBlank:false}},
+		{text: "Latitude",dataIndex: 'titik_tengah_lat',flex: 1, sortable: false,editor: {xtype: 'textfield',allowBlank:false}},				
+		{text: "Longitude",dataIndex: 'titik_tengah_long',flex: 1,sortable: false, editor: {xtype: 'textfield',allowBlank:false}},
 	],
 	dockedItems: [
 	{
@@ -134,87 +126,30 @@ var grid_m_kab = Ext.create('Ext.grid.Panel', {
 		items: 
 		[
 		{
-			text:'Tambah Data',
-			iconCls: 'icon-add',
-			handler: function(){          
-				var r = Ext.create('mdl_kab', {
-					kecamatan : '[NAMA-KABUPATEN]',
-				});
-				store_kab.insert(0, r);
-				APcellEditing_m_kab.startEdit(0, 0);									
-			}
-		},
-		{
-			text:'Delete',
-			iconCls: 'icon-del',
-			handler: function() {          
-				var records = grid_m_kab.getView().getSelectionModel().getSelection(), id=[];
-				Ext.Array.each(records, function(rec){
-					id.push(rec.get('id'));
-				});
-				if(id != '')
-				{
-				Ext.MessageBox.confirm('Hapus', 'Apakah anda akan menghapus item ini (' + id.join(',') + ') ?',
-				function(resbtn){
-					if(resbtn == 'yes')
-					{
-						Ext.Ajax.request({
-							url: '<?=base_url();?>index.php/transaksi/Master/master_del/tbl_kabupaten/id',
-							method: 'POST',											
-							params: {												
-								'id' : id.join(','),
-							},								
-							success: function(response) {
-								Ext.MessageBox.alert('OK', response.responseText, function()
-								{
-									store_kab.load();
-								});
-							},
-							failure: function(response) {
-								Ext.MessageBox.alert('Failure', 'Insert Data Error due to connection problem, or duplicate entries!');
-							}
-						});			   	
-					} 
-				});
-				} else 
-				{
-					Ext.MessageBox.alert('Error', 'Silahkan pilih item yang mau dihapus!');
-				}
-			}
-		},		
-		{
 			text:'Refresh',
 			iconCls: 'icon-reload',
 			handler: function(){          
-				store_kab.load();
+				store_tt.load();
 			}
-		},'->',
-		{
-			xtype: 'searchfield',
-			remoteFilter: true,
-			store: store_kab,
-			id: 'searchField',
-			emptyText: 'Kabupaten',
-			width: '30%',
-		},		
+		}
 		]
 	}],
    bbar: Ext.create('Ext.PagingToolbar',{
-		store: store_kab,
+		store: store_tt,
 		displayInfo: true,
 		displayMsg: 'Displaying Data : {0} - {1} of {2}',
 		emptyMsg: "No Display Data"
 	}),	
 	listeners:{
 		beforerender:function(){
-			store_kab.load();
+			store_tt.load();
 		}
 	}			
 });
 	
     Ext.create('Ext.container.Viewport', {
         layout: 'fit',
-        items: [grid_m_kab]
+        items: [grid_m_tt]
     });
 	
 
