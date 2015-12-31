@@ -62,6 +62,19 @@ Ext.onReady(function(){
     });
 	
 
+	var store3 = new Ext.data.JsonStore({
+		fields : ['kabupaten', 'tahun_terima', 'totdata'],
+		autoLoad:true, 
+		proxy: {
+			type: 'ajax',
+			url: '<?=base_url()?>index.php/rutilahu/Main/get_chart3',
+			reader: {
+				type: 'json',
+				root: ''
+			}
+		}
+    });
+	
     var chart1 = Ext.create('Ext.chart.Chart', {
             animate: true,
             shadow: true,
@@ -151,39 +164,46 @@ Ext.onReady(function(){
             }]			
         });
 		
-/*	
-    var chart1 = Ext.create('Ext.chart.Chart', {
-            style: 'background:#fff',
-            animate: true,
-            shadow: true,
-            store: store1,
-            legend: {
-              position: 'right'  
-            },
-            axes: [{
-                type: 'Numeric',
-                position: 'bottom',
-                fields: ['data1', 'data2', 'data3'],
-                minimum: 0,
-                label: {
-                    renderer: Ext.util.Format.numberRenderer('0,0')
-                },
-                grid: true,
-                title: 'Number of Hits'
-            }, {
-                type: 'Category',
-                position: 'left',
-                fields: ['name'],
-                title: 'Month of the Year'
-            }],
-            series: [{
-                type: 'bar',
-                axis: 'bottom',
-                xField: 'name',
-                yField: ['data1', 'data2', 'data3']
-            }]
-        });
-		*/
+    var chart3 = Ext.create('Ext.chart.Chart', {
+		style: 'background:#fff',
+		animate: true,
+		shadow: true,
+		store: store3,
+		axes: [{
+			type: 'Numeric',
+			position: 'bottom',
+			fields: ['totdata'],
+			minimum: 0,
+			label: {
+				renderer: Ext.util.Format.numberRenderer('0,0')
+			},
+			grid: true,
+			title: 'Jumlah Penerima Bantuan'
+		}, {
+			type: 'Category',
+			position: 'left',
+			fields: ['kabupaten'],
+			title: 'Kabupaten'
+		}],
+		series: [{
+			type: 'bar',
+			axis: 'bottom',
+			xField: 'totdata',
+			yField: ['totdata'],
+			tips: {
+				trackMouse: true,
+				width: 250,
+				height: 38,
+				renderer: function(storeItem, item) {
+					this.setTitle(storeItem.get('kabupaten') + ' / '+ storeItem.get('tahun_terima'));
+					this.update(storeItem.get('totdata'));
+				}
+			},
+			style: {
+				fill: '#ccffcc'
+			}
+		}]
+	});
 		
     var panel1 = Ext.create('widget.panel', {
         renderTo: Ext.getBody(),
@@ -232,6 +252,30 @@ Ext.onReady(function(){
         }],
         items: [chart2]
     });
+
+    var panel3 = Ext.create('widget.panel', {
+        renderTo: Ext.getBody(),
+		height: '100%',
+        layout: 'fit',
+        tbar: [{
+            text: 'Export Grafik',
+            handler: function() {
+                Ext.MessageBox.confirm('Download', 'Grafik akan disimpan sbg gambar, pastikan anda terhubung dg internet.', function(choice){
+                    if(choice == 'yes'){
+                        chart2.save({
+                            type: 'image/png'
+                        });
+                    }
+                });
+            }
+        }, {
+            text: 'Reload Data',
+            handler: function() {
+				store3.load();
+            }
+        }],
+        items: [chart3]
+    });
 	
 	new Ext.create('Ext.Viewport', {
 		layout: 'border',
@@ -240,7 +284,7 @@ Ext.onReady(function(){
 			region: 'north',
 			stateId: 'navigation-panel',
 			id: 'ctop', 
-			title: 'Total Penerima Bantuan RTLH - per Kecamatan',
+			title: 'Jumlah Penerima Bantuan RTLH - per Kecamatan',
 			height: '70%',
 			margins: '1 0 0 0',
 			layout: 'fit',
@@ -260,7 +304,7 @@ Ext.onReady(function(){
 				region: 'west',
 				stateId: 'navigation-panel',
 				id: 'ckiri', 
-				title: 'Penerima Bantuan Per Kabupaten',
+				title: 'Grafik Jumlah Penerima Bantuan RTLH Per Kabupaten',
 				height: '100%',
 				width: '50%',
 				split: true,				
@@ -272,11 +316,12 @@ Ext.onReady(function(){
 				region: 'east',
 				stateId: 'navigation-panel',
 				id: 'ckanan', 
-				title: 'per Tahun',
+				title: 'Grafik Jumlah Penerima Bantuan RTLH per Tahun',
 				width: '50%',
 				height: '100%',
 				margins: '1 0 0 0',
-				//layout: 'fit',		
+				layout: 'fit',		
+				items: [panel3]
 			}
 			],
 		}]

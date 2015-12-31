@@ -572,6 +572,25 @@ class Main extends CI_Controller {
 		echo json_encode($res);
 	}
 	
+	function get_chart3()
+	{
+		$query = "
+			select 
+			tbl_kabupaten.kabupaten, 
+			data_per_kab.tahun_terima, 
+			data_per_kab.tot as totdata
+			from tbl_kabupaten
+			left join (
+				select count(id_penerima) as tot, tahun_terima, kode_kab from tbl_penerima
+				group by tahun_terima
+			) as data_per_kab 
+			on data_per_kab.kode_kab = tbl_kabupaten.kode_kab
+			order by data_per_kab.tahun_terima asc
+		";		
+		$res = $this->db->query($query)->result();
+		echo json_encode($res);
+	}
+		
 	function layer_peta()
 	{		
 	}

@@ -124,8 +124,8 @@ var grid_m_kec = Ext.create('Ext.grid.Panel', {
 		{text: "kode_kecamatan",dataIndex: 'kode_kecamatan',flex: 1,sortable: false, editor: {xtype: 'textfield',allowBlank:false}},
 		{text: "kecamatan",dataIndex: 'kecamatan',flex: 1,sortable: false, editor: {xtype: 'textfield',allowBlank:false}},
 		{text: "kode_kab",dataIndex: 'kode_kab',flex: 1,sortable: false, editor: {xtype: 'textfield',allowBlank:false}},
-		{text: "kabupaten",dataIndex: 'kabupaten',flex: 1,sortable: false, editor: {xtype: 'textfield',allowBlank:false}},
-		{text: "provinsi",dataIndex: 'provinsi',flex: 1,sortable: false, editor: {xtype: 'textfield',allowBlank:false}},
+		{text: "kabupaten",dataIndex: 'kabupaten',flex: 1,sortable: false,},
+		{text: "provinsi",dataIndex: 'provinsi',flex: 1,sortable: false,},
 		{text: "kode_prov",dataIndex: 'kode_prov',flex: 1,sortable: false, editor: {xtype: 'textfield',allowBlank:false}},
 	],
 	dockedItems: [
@@ -140,6 +140,7 @@ var grid_m_kec = Ext.create('Ext.grid.Panel', {
 			handler: function(){          
 				var r = Ext.create('mdl_kec', {
 					kecamatan : '[NAMA-KECAMATAN]',
+					kode_prov : 25405,
 				});
 				store_kec.insert(0, r);
 				APcellEditing_m_kec.startEdit(0, 0);									
